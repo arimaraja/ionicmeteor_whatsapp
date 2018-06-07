@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component,OnInit } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
 import { Observable } from 'rxjs';
-import * as moment from 'moment';
-import { Chat, MessageType } from '../../models';
+//import * as moment from 'moment';
+import { Chat } from 'api/models';
+
+import { Chats, Messages } from 'api/collections';
 
 /**
  * Generated class for the ChatsPage page.
@@ -17,13 +19,52 @@ import { Chat, MessageType } from '../../models';
   selector: 'page-chats',
   templateUrl: 'chats.html',
 })
-export class ChatsPage {
-  chats : Observable<Chat[]>;
+export class ChatsPage implements OnInit {
+  chats;
 
   constructor(public navCtrl: NavController, public navParams: NavParams) {
-  	this.chats = this.findChats();
+  	//this.chats = this.findChats();
   }
 
+  InitChatDataStructure () {
+    this.chats = Chats
+        .find({})
+        .mergeMap( (chats:  Chat[])=>{
+            console.log("Inpt Chats ",chats);
+            return ( 
+                  Observable.combineLatest(
+                    ...chats.map( (chat: Chat) => {
+                     console.log("def chat id ", chat._id);
+                     console.log("Combine", Messages.find({chatID: chat._id})); 
+                   return (
+                     Messages
+                       .find({chatId: chat._id})
+                       .startWith(null)
+                       .map(messages => {
+                         if (messages) chat.lastMessage = messages[0];
+                         return chat;
+                       })
+                     )
+                   }
+                )
+              )
+            )
+          }
+        );    
+  }
+
+  ngOnInit() {
+    this.InitChatDataStructure();
+  }
+
+  removeChat(chat: Chat ): void {
+    Chats.remove({_id: chat._id}).subscribe( () => {
+    });
+
+    this.InitChatDataStructure(); 
+  }
+
+/*
   private findChats():Observable <Chat[]> {
   	return Observable.of( [
   			{
@@ -91,7 +132,7 @@ export class ChatsPage {
 		return chatsArray;
 	});
   }
-  
+*/  
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad ChatsPage');
