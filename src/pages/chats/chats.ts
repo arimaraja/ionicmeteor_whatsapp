@@ -7,6 +7,7 @@ import { Chat } from 'api/models';
 
 import { Chats, Messages } from 'api/collections';
 
+import { MessagesPage } from '../messages/messages';
 /**
  * Generated class for the ChatsPage page.
  *
@@ -55,6 +56,11 @@ export class ChatsPage implements OnInit {
 
   ngOnInit() {
     this.InitChatDataStructure();
+  }
+
+  //Ok action message display
+  showMessages(chat): void {
+    this.navCtrl.push(MessagesPage,{chat});
   }
 
   removeChat(chat: Chat ): void {
