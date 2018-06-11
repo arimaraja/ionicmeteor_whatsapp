@@ -52,6 +52,7 @@ export class ChatsPage implements OnInit {
             )
           }
         );    
+  
   }
 
   ngOnInit() {

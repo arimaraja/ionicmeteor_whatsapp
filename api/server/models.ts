@@ -15,6 +15,7 @@ export interface Message {
 	content?: string;
 	createdAt?: Date;
 	type?: MessageType
+	ownership?: string;
 }
 
 
